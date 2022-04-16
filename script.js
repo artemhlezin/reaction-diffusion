@@ -20,6 +20,15 @@ let bufferRTA = new THREE.WebGLRenderTarget(width, height, {
 });
 let bufferRTB = bufferRTA.clone();
 
+const initData = new THREE.DataTexture(
+  new Float32Array([1.0, 0.0, 0.0, 1.0]),
+  1,
+  1
+);
+initData.format = THREE.RGBAFormat;
+initData.type = THREE.FloatType;
+initData.needsUpdate = true;
+
 const pointer = new THREE.Vector2(0.5, 0.5);
 const emitter = { position: pointer, radius: 0.1, intensity: 1.0 };
 const pixelSize = new THREE.Vector2(1.0 / width, 1.0 / height);
@@ -27,7 +36,7 @@ const pixelSize = new THREE.Vector2(1.0 / width, 1.0 / height);
 const bufferQuad = new FullScreenQuad(
   new THREE.ShaderMaterial({
     uniforms: {
-      prevBuffer: { value: bufferRTB.texture },
+      prevBuffer: { value: initData },
       emitter: { value: emitter },
 
       aspect: { value: width / height },
@@ -46,18 +55,19 @@ const screen = new FullScreenQuad(
 function animate() {
   requestAnimationFrame(animate);
 
-  renderer.setRenderTarget(bufferRTA);
-  bufferQuad.render(renderer);
+  for (let i = 0; i < 10; i++) {
+    renderer.setRenderTarget(bufferRTA);
+    bufferQuad.render(renderer);
 
-  renderer.setRenderTarget(null);
+    renderer.setRenderTarget(null);
 
-  let tmp = bufferRTA;
-  bufferRTA = bufferRTB;
-  bufferRTB = tmp;
+    let tmp = bufferRTA;
+    bufferRTA = bufferRTB;
+    bufferRTB = tmp;
 
-  bufferQuad.material.uniforms.prevBuffer.value = bufferRTB.texture;
-  bufferQuad.material.uniforms.emitter.value.position = pointer;
-
+    bufferQuad.material.uniforms.prevBuffer.value = bufferRTB.texture;
+    bufferQuad.material.uniforms.emitter.value.position = pointer;
+  }
   screen.render(renderer);
 }
 
