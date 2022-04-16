@@ -22,6 +22,7 @@ let bufferRTB = bufferRTA.clone();
 
 const pointer = new THREE.Vector2(0.5, 0.5);
 const emitter = { position: pointer, radius: 0.1, intensity: 1.0 };
+const pixelSize = new THREE.Vector2(1.0 / width, 1.0 / height);
 
 const bufferQuad = new FullScreenQuad(
   new THREE.ShaderMaterial({
@@ -30,6 +31,7 @@ const bufferQuad = new FullScreenQuad(
       emitter: { value: emitter },
 
       aspect: { value: width / height },
+      pixelSize: { value: pixelSize },
     },
     vertexShader: bufferVS,
     fragmentShader: bufferFS,
@@ -66,6 +68,10 @@ window.addEventListener("resize", () => {
   height = window.innerHeight;
 
   bufferQuad.material.uniforms.aspect.value = width / height;
+  bufferQuad.material.uniforms.pixelSize.value = new THREE.Vector2(
+    1.0 / width,
+    1.0 / height
+  );
 
   renderer.setSize(width, height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
