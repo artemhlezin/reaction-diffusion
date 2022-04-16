@@ -6,8 +6,8 @@ const bufferFS = await fetch("shaders/buffer.frag").then((r) => r.text());
 
 /** @type {HTMLCanvasElement} */
 const canvas = document.querySelector("#gpu-canvas");
-const width = window.innerWidth;
-const height = window.innerHeight;
+let width = window.innerWidth;
+let height = window.innerHeight;
 
 const renderer = new THREE.WebGLRenderer({ canvas });
 renderer.setSize(width, height);
