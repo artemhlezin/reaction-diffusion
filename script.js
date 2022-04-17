@@ -83,6 +83,9 @@ window.addEventListener("resize", () => {
     1.0 / height
   );
 
+  bufferRTB.setSize(width, height);
+  bufferRTA.setSize(width, height);
+
   renderer.setSize(width, height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
