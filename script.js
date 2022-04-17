@@ -3,6 +3,7 @@ import { FullScreenQuad } from "three/examples/jsm/postprocessing/Pass.js";
 
 const bufferVS = await fetch("shaders/buffer.vert").then((r) => r.text());
 const bufferFS = await fetch("shaders/buffer.frag").then((r) => r.text());
+const colorFS = await fetch("shaders/color.frag").then((r) => r.text());
 
 /** @type {HTMLCanvasElement} */
 const canvas = document.querySelector("#gpu-canvas");
@@ -47,8 +48,12 @@ const bufferQuad = new FullScreenQuad(
   })
 );
 const screen = new FullScreenQuad(
-  new THREE.MeshBasicMaterial({
-    map: bufferRTA.texture,
+  new THREE.ShaderMaterial({
+    uniforms: {
+      map: { value: bufferRTA.texture },
+    },
+    vertexShader: bufferVS,
+    fragmentShader: colorFS,
   })
 );
 
