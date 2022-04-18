@@ -1,5 +1,5 @@
 # Reaction Diffusion
-Three.js reaction-diffusion implementation with ping-pong FBO.
+Three.js reaction-diffusion implementation using ping-pong FBO.
 
 [Online Demo](https://artemhlezin.github.io/reaction-diffusion/)
 
