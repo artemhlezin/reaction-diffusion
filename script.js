@@ -76,7 +76,7 @@ const screen = new FullScreenQuad(
 );
 
 const buttons = {
-  reset: () => {
+  clean: () => {
     bufferQuad.material.uniforms.prevBuffer.value = initData.texture;
   },
   howto: () => {
@@ -109,7 +109,7 @@ gui
   .onChange((v) => {
     quadUniforms.emitter.value.radius = v;
   });
-gui.add(buttons, "reset");
+gui.add(buttons, "clean").name("Clean");
 gui.add(buttons, "howto").name("How to choose parameters?");
 
 function animate() {
