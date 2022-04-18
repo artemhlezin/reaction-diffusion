@@ -70,8 +70,6 @@ const screen = new FullScreenQuad(
   })
 );
 
-// Setup GUI
-
 const buttons = {
   reset: () => {
     bufferQuad.material.uniforms.prevBuffer.value = initData.texture;
