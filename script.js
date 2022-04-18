@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { FullScreenQuad } from "three/examples/jsm/postprocessing/Pass.js";
+import GUI from "lil-gui";
 
 const bufferVS = await fetch("shaders/buffer.vert").then((r) => r.text());
 const bufferFS = await fetch("shaders/buffer.frag").then((r) => r.text());
@@ -32,6 +33,14 @@ initData.needsUpdate = true;
 
 const pointer = new THREE.Vector2(0.5, 0.5);
 const emitter = { position: pointer, radius: 0.1, intensity: 1.0 };
+const simParams = {
+  dA: 1.0,
+  dB: 0.5,
+  feed: 0.055,
+  kill: 0.062,
+  timeStep: 1.0,
+  iterations: 10,
+};
 const pixelSize = new THREE.Vector2(1.0 / width, 1.0 / height);
 
 const bufferQuad = new FullScreenQuad(
@@ -39,7 +48,11 @@ const bufferQuad = new FullScreenQuad(
     uniforms: {
       prevBuffer: { value: initData },
       emitter: { value: emitter },
-
+      dA: { value: simParams.dA },
+      dB: { value: simParams.dB },
+      feed: { value: simParams.feed },
+      kill: { value: simParams.kill },
+      timeStep: { value: simParams.timeStep },
       aspect: { value: width / height },
       pixelSize: { value: pixelSize },
     },
@@ -57,10 +70,49 @@ const screen = new FullScreenQuad(
   })
 );
 
+// Setup GUI
+
+const buttons = {
+  reset: () => {
+    bufferQuad.material.uniforms.prevBuffer.value = initData.texture;
+  },
+  howto: () => {
+    window.open("https://mrob.com/pub/comp/xmorphia/", "_blank");
+  },
+};
+
+const gui = new GUI();
+const quadUniforms = bufferQuad.material.uniforms;
+
+gui.add(simParams, "dA", 0, 1).onChange((v) => {
+  quadUniforms.dA.value = v;
+});
+gui.add(simParams, "dB", 0, 1).onChange((v) => {
+  quadUniforms.dB.value = v;
+});
+gui.add(simParams, "feed", 0.01, 0.1).onChange((v) => {
+  quadUniforms.feed.value = v;
+});
+gui.add(simParams, "kill", 0.03, 0.07).onChange((v) => {
+  quadUniforms.kill.value = v;
+});
+gui.add(simParams, "timeStep", 0, 1).onChange((v) => {
+  quadUniforms.timeStep.value = v;
+});
+gui.add(simParams, "iterations", 0, 100, 1);
+gui
+  .add(emitter, "radius", 0, 0.5, 0.01)
+  .name("emitter radius")
+  .onChange((v) => {
+    quadUniforms.emitter.value.radius = v;
+  });
+gui.add(buttons, "reset");
+gui.add(buttons, "howto").name("How to choose parameters?");
+
 function animate() {
   requestAnimationFrame(animate);
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < simParams.iterations; i++) {
     renderer.setRenderTarget(bufferRTA);
     bufferQuad.render(renderer);
 
@@ -71,7 +123,6 @@ function animate() {
     bufferRTB = tmp;
 
     bufferQuad.material.uniforms.prevBuffer.value = bufferRTB.texture;
-    bufferQuad.material.uniforms.emitter.value.position = pointer;
   }
   screen.render(renderer);
 }
