@@ -31,8 +31,12 @@ initData.format = THREE.RGBAFormat;
 initData.type = THREE.FloatType;
 initData.needsUpdate = true;
 
-const pointer = new THREE.Vector2(0.5, 0.5);
-const emitter = { position: pointer, radius: 0.1, intensity: 1.0 };
+const pointer = {
+  position: new THREE.Vector2(0.0, 0.0),
+  radius: 0.1,
+  isDrawing: false,
+};
+
 const simParams = {
   dA: 1.0,
   dB: 0.5,
@@ -47,7 +51,8 @@ const bufferQuad = new FullScreenQuad(
   new THREE.ShaderMaterial({
     uniforms: {
       prevBuffer: { value: initData },
-      emitter: { value: emitter },
+      emitter: { value: pointer },
+
       dA: { value: simParams.dA },
       dB: { value: simParams.dB },
       feed: { value: simParams.feed },
@@ -99,7 +104,7 @@ gui.add(simParams, "timeStep", 0, 1).onChange((v) => {
 });
 gui.add(simParams, "iterations", 0, 100, 1);
 gui
-  .add(emitter, "radius", 0, 0.5, 0.01)
+  .add(pointer, "radius", 0, 0.5, 0.01)
   .name("emitter radius")
   .onChange((v) => {
     quadUniforms.emitter.value.radius = v;
@@ -121,6 +126,7 @@ function animate() {
     bufferRTB = tmp;
 
     bufferQuad.material.uniforms.prevBuffer.value = bufferRTB.texture;
+    bufferQuad.material.uniforms.emitter.value.isDrawing = pointer.isDrawing;
   }
   screen.render(renderer);
 }
@@ -145,6 +151,18 @@ window.addEventListener("resize", () => {
 });
 
 window.addEventListener("pointermove", (event) => {
-  pointer.x = event.clientX / width;
-  pointer.y = 1 - event.clientY / height;
+  if (pointer.isDrawing === true) {
+    pointer.position.x = event.clientX / width;
+    pointer.position.y = 1 - event.clientY / height;
+  }
+});
+
+window.addEventListener("pointerdown", (event) => {
+  pointer.position.x = event.clientX / width;
+  pointer.position.y = 1 - event.clientY / height;
+  pointer.isDrawing = true;
+});
+
+window.addEventListener("pointerup", (e) => {
+  pointer.isDrawing = false;
 });

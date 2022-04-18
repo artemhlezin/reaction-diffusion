@@ -1,7 +1,7 @@
 struct Emitter {
-  vec2 position;
+  bool isDrawing;
   float radius;
-  float intensity;
+  vec2 position;
 };
 
 uniform float dA;
@@ -18,7 +18,6 @@ uniform vec2 pixelSize;
 varying vec2 vUv;
 
 void main() {
-
   vec4 prevSim = texture2D(prevBuffer, vUv);
 
   vec4 laplacian = prevSim * -1.0;
@@ -43,7 +42,7 @@ void main() {
 
   float src = step(length((vUv - emitter.position) * vec2(aspect, 1.0)),
                    emitter.radius) *
-              emitter.intensity;
+              float(emitter.isDrawing);
 
   gl_FragColor = vec4(chemicalA, mix(chemicalB, 0.5, src), 0.0, 1.0);
 }
