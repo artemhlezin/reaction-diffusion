@@ -93,7 +93,7 @@ gui.add(simParams, "dA", 0, 1).onChange((v) => {
 gui.add(simParams, "dB", 0, 1).onChange((v) => {
   quadUniforms.dB.value = v;
 });
-gui.add(simParams, "feed", 0.01, 0.1).onChange((v) => {
+gui.add(simParams, "feed", 0.001, 0.1).onChange((v) => {
   quadUniforms.feed.value = v;
 });
 gui.add(simParams, "kill", 0.03, 0.07).onChange((v) => {
